@@ -36,7 +36,7 @@
 
 Рисунок 1.1 — Функция компетенции 
 
-<img width="605" height="1081" alt="image" src="https://github.com/user-attachments/assets/55697be0-700f-4bb3-aff3-aa2a649f44d1" />
+<img width="400" height="1081" alt="image" src="https://github.com/user-attachments/assets/55697be0-700f-4bb3-aff3-aa2a649f44d1" />
 
 Рисунок 1.2 — Функция анализа сотрудника 
 
