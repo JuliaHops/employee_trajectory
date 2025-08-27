@@ -70,7 +70,7 @@
 | Комбинированные| —                    | Сочетание качественных и количественных методов |
 
 
-<img width="674" height="699" alt="image" src="https://github.com/user-attachments/assets/bcc7b408-c237-4e25-a2e7-6c2b2a39ac19" />
+<img width="500" height="699" alt="image" src="https://github.com/user-attachments/assets/bcc7b408-c237-4e25-a2e7-6c2b2a39ac19" />
 
 Рисунок 2.2 — Модель требований
 
