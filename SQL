@@ -1,0 +1,1358 @@
+-- MySQL Workbench Forward Engineering
+
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+
+-- -----------------------------------------------------
+-- Schema Talent_management
+-- -----------------------------------------------------
+DROP SCHEMA IF EXISTS `Talent_management` ;
+
+-- -----------------------------------------------------
+-- Schema Talent_management
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS `Talent_management` DEFAULT CHARACTER SET utf8 ;
+USE `Talent_management` ;
+
+-- -----------------------------------------------------
+-- Table `Talent_management`.`Staff`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Talent_management`.`Staff` (
+  `idStaff` INT NOT NULL AUTO_INCREMENT,
+  `Staff_Name` VARCHAR(45) NOT NULL,
+  `Staff_FirstName` VARCHAR(45) NOT NULL,
+  `Staff_SecondName` VARCHAR(45) NULL,
+  `idDepartment` INT NOT NULL,
+  PRIMARY KEY (`idStaff`, `idDepartment`),
+  INDEX `fk_Staff_Department1_idx` (`idDepartment` ASC) VISIBLE,
+  CONSTRAINT `fk_Staff_Department1`
+    FOREIGN KEY (`idDepartment`)
+    REFERENCES `Talent_management`.`Department` (`idDepartment`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `Talent_management`.`Department`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Talent_management`.`Department` (
+  `idDepartment` INT NOT NULL AUTO_INCREMENT,
+  `Departmentcol` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`idDepartment`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `Talent_management`.`Staff`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Talent_management`.`Staff` (
+  `idStaff` INT NOT NULL AUTO_INCREMENT,
+  `Staff_Name` VARCHAR(45) NOT NULL,
+  `Staff_FirstName` VARCHAR(45) NOT NULL,
+  `Staff_SecondName` VARCHAR(45) NULL,
+  `idDepartment` INT NOT NULL,
+  PRIMARY KEY (`idStaff`, `idDepartment`),
+  INDEX `fk_Staff_Department1_idx` (`idDepartment` ASC) VISIBLE,
+  CONSTRAINT `fk_Staff_Department1`
+    FOREIGN KEY (`idDepartment`)
+    REFERENCES `Talent_management`.`Department` (`idDepartment`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `Talent_management`.`Talant`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Talent_management`.`Talant` (
+  `idTalant` INT NOT NULL AUTO_INCREMENT,
+  `Talantcol` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`idTalant`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `Talent_management`.`Level`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Talent_management`.`Level` (
+  `idLevel` INT NOT NULL AUTO_INCREMENT,
+  `Levelcol` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`idLevel`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `Talent_management`.`Qualification`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Talent_management`.`Qualification` (
+  `idTalant` INT NOT NULL,
+  `idStaff` INT NOT NULL,
+  `idLevel` INT NOT NULL,
+  PRIMARY KEY (`idTalant`, `idStaff`, `idLevel`),
+  INDEX `fk_Talant_has_Staff_Staff1_idx` (`idStaff` ASC) VISIBLE,
+  INDEX `fk_Talant_has_Staff_Talant1_idx` (`idTalant` ASC) VISIBLE,
+  INDEX `fk_Qualification_Level1_idx` (`idLevel` ASC) VISIBLE,
+  CONSTRAINT `fk_Talant_has_Staff_Talant1`
+    FOREIGN KEY (`idTalant`)
+    REFERENCES `Talent_management`.`Talant` (`idTalant`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_Talant_has_Staff_Staff1`
+    FOREIGN KEY (`idStaff`)
+    REFERENCES `Talent_management`.`Staff` (`idStaff`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_Qualification_Level1`
+    FOREIGN KEY (`idLevel`)
+    REFERENCES `Talent_management`.`Level` (`idLevel`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `Talent_management`.`Task`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Talent_management`.`Task` (
+  `idTask` INT NOT NULL AUTO_INCREMENT,
+  `Taskcol` VARCHAR(1000) NOT NULL,
+  `Task_hour` FLOAT NOT NULL,
+  PRIMARY KEY (`idTask`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `Talent_management`.`Talant_Task`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Talent_management`.`Talant_Task` (
+  `idTalant` INT NOT NULL,
+  `idLevel` INT NOT NULL,
+  `idTask` INT NOT NULL,
+  PRIMARY KEY (`idTalant`, `idLevel`, `idTask`),
+  INDEX `fk_Talant_Task_Level1_idx` (`idLevel` ASC) VISIBLE,
+  INDEX `fk_Talant_Task_Task1_idx` (`idTask` ASC) VISIBLE,
+  CONSTRAINT `fk_Talant_Task_Talant1`
+    FOREIGN KEY (`idTalant`)
+    REFERENCES `Talent_management`.`Talant` (`idTalant`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_Talant_Task_Level1`
+    FOREIGN KEY (`idLevel`)
+    REFERENCES `Talent_management`.`Level` (`idLevel`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_Talant_Task_Task1`
+    FOREIGN KEY (`idTask`)
+    REFERENCES `Talent_management`.`Task` (`idTask`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `Talent_management`.`Level_cost`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Talent_management`.`Level_cost` (
+  `idLevel` INT NOT NULL,
+  `idTalant` INT NOT NULL,
+  `Level_cost` FLOAT NOT NULL,
+  PRIMARY KEY (`idLevel`, `idTalant`),
+  INDEX `fk_Level_cost_Talant1_idx` (`idTalant` ASC) VISIBLE,
+  CONSTRAINT `fk_Level_cost_Level1`
+    FOREIGN KEY (`idLevel`)
+    REFERENCES `Talent_management`.`Level` (`idLevel`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_Level_cost_Talant1`
+    FOREIGN KEY (`idTalant`)
+    REFERENCES `Talent_management`.`Talant` (`idTalant`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `Talent_management`.`Vacancy`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Talent_management`.`Vacancy` (
+  `idVacancy` INT NOT NULL AUTO_INCREMENT,
+  `Vacancycol` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`idVacancy`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `Talent_management`.`Request`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Talent_management`.`Request` (
+  `idLevel` INT NOT NULL,
+  `idTalant` INT NOT NULL,
+  `idVacancy` INT NOT NULL,
+  `Priority` INT NULL,
+  PRIMARY KEY (`idLevel`, `idTalant`, `idVacancy`),
+  INDEX `fk_Request_Talant1_idx` (`idTalant` ASC) VISIBLE,
+  INDEX `fk_Request_Vacancy1_idx` (`idVacancy` ASC) VISIBLE,
+  CONSTRAINT `fk_Request_Level1`
+    FOREIGN KEY (`idLevel`)
+    REFERENCES `Talent_management`.`Level` (`idLevel`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_Request_Talant1`
+    FOREIGN KEY (`idTalant`)
+    REFERENCES `Talent_management`.`Talant` (`idTalant`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_Request_Vacancy1`
+    FOREIGN KEY (`idVacancy`)
+    REFERENCES `Talent_management`.`Vacancy` (`idVacancy`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `Talent_management`.`Shedule`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Talent_management`.`Shedule` (
+  `idTask` INT NOT NULL AUTO_INCREMENT,
+  `idStaff` INT NOT NULL,
+  PRIMARY KEY (`idTask`, `idStaff`),
+  INDEX `fk_Task_has_Staff_Staff1_idx` (`idStaff` ASC) VISIBLE,
+  INDEX `fk_Task_has_Staff_Task1_idx` (`idTask` ASC) VISIBLE,
+  CONSTRAINT `fk_Task_has_Staff_Task1`
+    FOREIGN KEY (`idTask`)
+    REFERENCES `Talent_management`.`Task` (`idTask`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_Task_has_Staff_Staff1`
+    FOREIGN KEY (`idStaff`)
+    REFERENCES `Talent_management`.`Staff` (`idStaff`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
+-- -----------------------------------------------------
+-- Data for table `Talent_management`.`Department`
+-- -----------------------------------------------------
+START TRANSACTION;
+USE `Talent_management`;
+INSERT INTO `Talent_management`.`Department` (`idDepartment`, `Departmentcol`) VALUES (1, 'Отдел продаж');
+INSERT INTO `Talent_management`.`Department` (`idDepartment`, `Departmentcol`) VALUES (2, 'Отдел маркетинга');
+INSERT INTO `Talent_management`.`Department` (`idDepartment`, `Departmentcol`) VALUES (3, 'Отдел производства');
+INSERT INTO `Talent_management`.`Department` (`idDepartment`, `Departmentcol`) VALUES (4, 'Отдел кадров');
+INSERT INTO `Talent_management`.`Department` (`idDepartment`, `Departmentcol`) VALUES (5, 'Отдел финансов');
+INSERT INTO `Talent_management`.`Department` (`idDepartment`, `Departmentcol`) VALUES (6, 'Отдел безопасности');
+
+COMMIT;
+
+
+-- -----------------------------------------------------
+-- Data for table `Talent_management`.`Staff`
+-- -----------------------------------------------------
+START TRANSACTION;
+USE `Talent_management`;
+INSERT INTO `Talent_management`.`Staff` (`idStaff`, `Staff_Name`, `Staff_FirstName`, `Staff_SecondName`, `idDepartment`) VALUES (1, 'Сергей', 'Новиков', NULL, 1.1);
+INSERT INTO `Talent_management`.`Staff` (`idStaff`, `Staff_Name`, `Staff_FirstName`, `Staff_SecondName`, `idDepartment`) VALUES (2, 'Артём', 'Никитин', '', 1);
+INSERT INTO `Talent_management`.`Staff` (`idStaff`, `Staff_Name`, `Staff_FirstName`, `Staff_SecondName`, `idDepartment`) VALUES (3, 'Иван', 'Кузнецов', '', 3);
+INSERT INTO `Talent_management`.`Staff` (`idStaff`, `Staff_Name`, `Staff_FirstName`, `Staff_SecondName`, `idDepartment`) VALUES (4, 'Дарья', 'Дмитриева', 'Федоровна', 4);
+INSERT INTO `Talent_management`.`Staff` (`idStaff`, `Staff_Name`, `Staff_FirstName`, `Staff_SecondName`, `idDepartment`) VALUES (5, 'Дмитрий', 'Соколов', '', 5);
+INSERT INTO `Talent_management`.`Staff` (`idStaff`, `Staff_Name`, `Staff_FirstName`, `Staff_SecondName`, `idDepartment`) VALUES (6, 'Виктория', 'Киселёва', '', 6);
+INSERT INTO `Talent_management`.`Staff` (`idStaff`, `Staff_Name`, `Staff_FirstName`, `Staff_SecondName`, `idDepartment`) VALUES (7, 'Алексей', 'Иванов', '', 1);
+INSERT INTO `Talent_management`.`Staff` (`idStaff`, `Staff_Name`, `Staff_FirstName`, `Staff_SecondName`, `idDepartment`) VALUES (8, 'Юлия', 'Ермакова', '', 2);
+INSERT INTO `Talent_management`.`Staff` (`idStaff`, `Staff_Name`, `Staff_FirstName`, `Staff_SecondName`, `idDepartment`) VALUES (9, 'Николай', 'Волков', '', 3);
+INSERT INTO `Talent_management`.`Staff` (`idStaff`, `Staff_Name`, `Staff_FirstName`, `Staff_SecondName`, `idDepartment`) VALUES (10, 'Татьяна', 'Федорова', 'Грегорьевна', 4);
+INSERT INTO `Talent_management`.`Staff` (`idStaff`, `Staff_Name`, `Staff_FirstName`, `Staff_SecondName`, `idDepartment`) VALUES (11, 'Александр', 'Петров', '', 5);
+INSERT INTO `Talent_management`.`Staff` (`idStaff`, `Staff_Name`, `Staff_FirstName`, `Staff_SecondName`, `idDepartment`) VALUES (12, 'Анна', 'Лебедева', '', 6);
+INSERT INTO `Talent_management`.`Staff` (`idStaff`, `Staff_Name`, `Staff_FirstName`, `Staff_SecondName`, `idDepartment`) VALUES (13, 'Михаил', 'Миронов', '', 1);
+INSERT INTO `Talent_management`.`Staff` (`idStaff`, `Staff_Name`, `Staff_FirstName`, `Staff_SecondName`, `idDepartment`) VALUES (14, 'Наталья', 'Орлова', '', 2);
+INSERT INTO `Talent_management`.`Staff` (`idStaff`, `Staff_Name`, `Staff_FirstName`, `Staff_SecondName`, `idDepartment`) VALUES (15, 'Евгений', 'Козлов', '', 3);
+INSERT INTO `Talent_management`.`Staff` (`idStaff`, `Staff_Name`, `Staff_FirstName`, `Staff_SecondName`, `idDepartment`) VALUES (16, 'Екатерина', 'Лазарева', 'Андреевна', 4);
+INSERT INTO `Talent_management`.`Staff` (`idStaff`, `Staff_Name`, `Staff_FirstName`, `Staff_SecondName`, `idDepartment`) VALUES (17, 'Владимир', 'Павлов', 'Викторович', 5);
+INSERT INTO `Talent_management`.`Staff` (`idStaff`, `Staff_Name`, `Staff_FirstName`, `Staff_SecondName`, `idDepartment`) VALUES (18, 'Софья', 'Захарова', '', 6);
+INSERT INTO `Talent_management`.`Staff` (`idStaff`, `Staff_Name`, `Staff_FirstName`, `Staff_SecondName`, `idDepartment`) VALUES (19, 'Павел', 'Семёнов', '', 1);
+INSERT INTO `Talent_management`.`Staff` (`idStaff`, `Staff_Name`, `Staff_FirstName`, `Staff_SecondName`, `idDepartment`) VALUES (20, 'Мария', 'Смирнова', '', 2);
+INSERT INTO `Talent_management`.`Staff` (`idStaff`, `Staff_Name`, `Staff_FirstName`, `Staff_SecondName`, `idDepartment`) VALUES (21, 'Константин', 'Васильев', '', 3);
+INSERT INTO `Talent_management`.`Staff` (`idStaff`, `Staff_Name`, `Staff_FirstName`, `Staff_SecondName`, `idDepartment`) VALUES (22, 'Марина', 'Фролова', '', 4);
+INSERT INTO `Talent_management`.`Staff` (`idStaff`, `Staff_Name`, `Staff_FirstName`, `Staff_SecondName`, `idDepartment`) VALUES (23, 'Николай', 'Краснов', '', 5);
+INSERT INTO `Talent_management`.`Staff` (`idStaff`, `Staff_Name`, `Staff_FirstName`, `Staff_SecondName`, `idDepartment`) VALUES (24, 'Ирина', 'Белова', '', 6);
+INSERT INTO `Talent_management`.`Staff` (`idStaff`, `Staff_Name`, `Staff_FirstName`, `Staff_SecondName`, `idDepartment`) VALUES (25, 'Роман', 'Воробьёв', '', 3);
+INSERT INTO `Talent_management`.`Staff` (`idStaff`, `Staff_Name`, `Staff_FirstName`, `Staff_SecondName`, `idDepartment`) VALUES (26, 'Елена', 'Морозова', '', 2);
+INSERT INTO `Talent_management`.`Staff` (`idStaff`, `Staff_Name`, `Staff_FirstName`, `Staff_SecondName`, `idDepartment`) VALUES (27, 'Виктор', 'Соловьёв', '', 5);
+INSERT INTO `Talent_management`.`Staff` (`idStaff`, `Staff_Name`, `Staff_FirstName`, `Staff_SecondName`, `idDepartment`) VALUES (28, 'Анжелика', 'Тимофеева', '', 6);
+INSERT INTO `Talent_management`.`Staff` (`idStaff`, `Staff_Name`, `Staff_FirstName`, `Staff_SecondName`, `idDepartment`) VALUES (29, 'Ольга', 'Попова', 'Тимофеевна', 4);
+INSERT INTO `Talent_management`.`Staff` (`idStaff`, `Staff_Name`, `Staff_FirstName`, `Staff_SecondName`, `idDepartment`) VALUES (30, 'Оксана', 'Григорьева', '', 2);
+INSERT INTO `Talent_management`.`Staff` (`idStaff`, `Staff_Name`, `Staff_FirstName`, `Staff_SecondName`, `idDepartment`) VALUES (31, 'Андрей', 'Зайцев', '', 1);
+INSERT INTO `Talent_management`.`Staff` (`idStaff`, `Staff_Name`, `Staff_FirstName`, `Staff_SecondName`, `idDepartment`) VALUES (32, 'Светлана', 'Мельникова', '', 3);
+
+COMMIT;
+
+
+-- -----------------------------------------------------
+-- Data for table `Talent_management`.`Talant`
+-- -----------------------------------------------------
+START TRANSACTION;
+USE `Talent_management`;
+INSERT INTO `Talent_management`.`Talant` (`idTalant`, `Talantcol`) VALUES (1, 'Управление проектами');
+INSERT INTO `Talent_management`.`Talant` (`idTalant`, `Talantcol`) VALUES (2, 'Анализ данных');
+INSERT INTO `Talent_management`.`Talant` (`idTalant`, `Talantcol`) VALUES (3, 'Цифровой маркетинг');
+INSERT INTO `Talent_management`.`Talant` (`idTalant`, `Talantcol`) VALUES (4, 'Frontend-разработка');
+INSERT INTO `Talent_management`.`Talant` (`idTalant`, `Talantcol`) VALUES (5, 'Backend-разработка');
+INSERT INTO `Talent_management`.`Talant` (`idTalant`, `Talantcol`) VALUES (6, 'UX/UI-дизайн');
+INSERT INTO `Talent_management`.`Talant` (`idTalant`, `Talantcol`) VALUES (7, 'Финансовое моделирование');
+INSERT INTO `Talent_management`.`Talant` (`idTalant`, `Talantcol`) VALUES (8, 'Комплаенс и управление рисками');
+INSERT INTO `Talent_management`.`Talant` (`idTalant`, `Talantcol`) VALUES (9, 'Лидерство и управление командой');
+INSERT INTO `Talent_management`.`Talant` (`idTalant`, `Talantcol`) VALUES (10, 'Креативное мышление');
+
+COMMIT;
+
+
+-- -----------------------------------------------------
+-- Data for table `Talent_management`.`Level`
+-- -----------------------------------------------------
+START TRANSACTION;
+USE `Talent_management`;
+INSERT INTO `Talent_management`.`Level` (`idLevel`, `Levelcol`) VALUES (1, 'Поверхностный');
+INSERT INTO `Talent_management`.`Level` (`idLevel`, `Levelcol`) VALUES (2, 'Базовый');
+INSERT INTO `Talent_management`.`Level` (`idLevel`, `Levelcol`) VALUES (3, 'Хороший');
+INSERT INTO `Talent_management`.`Level` (`idLevel`, `Levelcol`) VALUES (4, 'Отличный');
+INSERT INTO `Talent_management`.`Level` (`idLevel`, `Levelcol`) VALUES (5, 'Профессиональный');
+
+COMMIT;
+
+
+-- -----------------------------------------------------
+-- Data for table `Talent_management`.`Qualification`
+-- -----------------------------------------------------
+START TRANSACTION;
+USE `Talent_management`;
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (1, 1, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (2, 1, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (3, 1, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (4, 1, 4);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (5, 1, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (6, 1, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (7, 1, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (8, 1, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (9, 1, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (10, 1, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (1, 2, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (2, 2, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (3, 2, 4);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (4, 2, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (5, 2, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (6, 2, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (7, 2, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (8, 2, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (9, 2, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (10, 2, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (1, 3, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (2, 3, 4);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (3, 3, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (4, 3, 5);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (5, 3, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (6, 3, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (7, 3, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (8, 3, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (9, 3, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (10, 3, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (1, 4, 4);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (2, 4, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (3, 4, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (4, 4, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (5, 4, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (6, 4, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (7, 4, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (8, 4, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (9, 4, 4);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (10, 4, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (1, 5, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (2, 5, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (3, 5, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (4, 5, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (5, 5, 5);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (6, 5, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (7, 5, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (8, 5, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (9, 5, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (10, 5, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (1, 6, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (2, 6, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (3, 6, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (4, 6, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (5, 6, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (6, 6, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (7, 6, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (8, 6, 5);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (9, 6, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (10, 6, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (1, 7, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (2, 7, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (3, 7, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (4, 7, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (5, 7, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (6, 7, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (7, 7, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (8, 7, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (9, 7, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (10, 7, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (1, 8, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (2, 8, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (3, 8, 5);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (4, 8, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (5, 8, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (6, 8, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (7, 8, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (8, 8, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (9, 8, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (10, 8, 4);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (1, 9, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (2, 9, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (3, 9, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (4, 9, 4);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (5, 9, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (6, 9, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (7, 9, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (8, 9, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (9, 9, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (10, 9, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (1, 10, 4);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (2, 10, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (3, 10, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (4, 10, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (5, 10, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (6, 10, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (7, 10, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (8, 10, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (9, 10, 5);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (10, 10, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (1, 11, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (2, 11, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (3, 11, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (4, 11, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (5, 11, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (6, 11, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (7, 11, 4);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (8, 11, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (9, 11, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (10, 11, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (1, 12, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (2, 12, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (3, 12, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (4, 12, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (5, 12, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (6, 12, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (7, 12, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (8, 12, 5);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (9, 12, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (10, 12, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (1, 13, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (2, 13, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (3, 13, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (4, 13, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (5, 13, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (6, 13, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (7, 13, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (8, 13, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (9, 13, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (10, 13, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (1, 14, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (2, 14, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (3, 14, 5);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (4, 14, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (5, 14, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (6, 14, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (7, 14, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (8, 14, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (9, 14, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (10, 14, 4);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (1, 15, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (2, 15, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (3, 15, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (4, 15, 5);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (5, 15, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (6, 15, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (7, 15, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (8, 15, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (9, 15, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (10, 15, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (1, 16, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (2, 16, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (3, 16, 4);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (4, 16, 4);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (5, 16, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (6, 16, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (7, 16, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (8, 16, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (9, 16, 5);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (10, 16, 4);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (1, 17, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (2, 17, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (3, 17, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (4, 17, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (5, 17, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (6, 17, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (7, 17, 4);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (8, 17, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (9, 17, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (10, 17, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (1, 18, 5);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (2, 18, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (3, 18, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (4, 18, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (5, 18, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (6, 18, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (7, 18, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (8, 18, 4);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (9, 18, 4);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (10, 18, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (1, 19, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (2, 19, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (3, 19, 4);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (4, 19, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (5, 19, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (6, 19, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (7, 19, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (8, 19, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (9, 19, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (10, 19, 4);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (1, 20, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (2, 20, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (3, 20, 5);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (4, 20, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (5, 20, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (6, 20, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (7, 20, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (8, 20, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (9, 20, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (10, 20, 4);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (1, 21, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (2, 21, 4);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (3, 21, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (4, 21, 4);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (5, 21, 5);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (6, 21, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (7, 21, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (8, 21, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (9, 21, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (10, 21, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (1, 22, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (2, 22, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (3, 22, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (4, 22, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (5, 22, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (6, 22, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (7, 22, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (8, 22, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (9, 22, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (10, 22, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (1, 23, 4);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (2, 23, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (3, 23, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (4, 23, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (5, 23, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (6, 23, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (7, 23, 5);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (8, 23, 4);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (9, 23, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (10, 23, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (1, 24, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (2, 24, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (3, 24, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (4, 24, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (5, 24, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (6, 24, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (7, 24, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (8, 24, 5);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (9, 24, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (10, 24, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (1, 25, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (2, 25, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (3, 25, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (4, 25, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (5, 25, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (6, 25, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (7, 25, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (8, 25, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (9, 25, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (10, 25, 4);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (1, 26, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (2, 26, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (3, 26, 5);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (4, 26, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (5, 26, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (6, 26, 4);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (7, 26, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (8, 26, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (9, 26, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (10, 26, 5);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (1, 27, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (2, 27, 4);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (3, 27, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (4, 27, 4);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (5, 27, 5);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (6, 27, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (7, 27, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (8, 27, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (9, 27, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (10, 27, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (1, 28, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (2, 28, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (3, 28, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (4, 28, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (5, 28, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (6, 28, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (7, 28, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (8, 28, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (9, 28, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (10, 28, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (1, 29, 4);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (2, 29, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (3, 29, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (4, 29, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (5, 29, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (6, 29, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (7, 29, 5);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (8, 29, 4);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (9, 29, 4);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (10, 29, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (1, 30, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (2, 30, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (3, 30, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (4, 30, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (5, 30, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (6, 30, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (7, 30, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (8, 30, 5);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (9, 30, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (10, 30, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (1, 31, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (2, 31, 5);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (3, 31, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (4, 31, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (5, 31, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (6, 31, 4);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (7, 31, 5);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (8, 31, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (9, 31, 4);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (10, 31, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (1, 32, 4);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (2, 32, 4);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (3, 32, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (4, 32, 4);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (5, 32, 5);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (6, 32, 3);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (7, 32, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (8, 32, 2);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (9, 32, 1);
+INSERT INTO `Talent_management`.`Qualification` (`idTalant`, `idStaff`, `idLevel`) VALUES (10, 32, 1);
+
+COMMIT;
+
+
+-- -----------------------------------------------------
+-- Data for table `Talent_management`.`Task`
+-- -----------------------------------------------------
+START TRANSACTION;
+USE `Talent_management`;
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (1, 'Разработка концепции рекламной кампании', 6.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (2, 'Анализ конкурентов по нише клиента', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (3, 'Создание контент-плана на месяц', 3.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (4, 'Настройка рекламного кабинета Google Ads', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (5, 'Подготовка отчета по результатам тестовой кампании', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (6, 'Мониторинг ключевых слов и SEO-анализ', 3.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (7, 'Дизайн макета для баннера в соцсетях', 1.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (8, 'Настройка UTM-меток для аналитики', 1.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (9, 'Работа с копирайтером над лендингом', 3.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (10, 'Ведение рекламной кампании в VK', 5.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (11, 'Проведение интервью с клиентом', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (12, 'Создание шаблонов писем для рассылки', 1.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (13, 'Создание прототипа лендинга в Figma', 5.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (14, 'Анализ эффективности SMM-активностей', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (15, 'Создание рекламных постов для Instagram', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (16, 'Написание рекламных текстов', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (17, 'Анализ показателей email-рассылок', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (18, 'Обновление визуального стиля бренда', 7.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (19, 'Настройка целей в Google Analytics', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (20, 'Оптимизация описаний товаров на сайте', 1.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (21, 'Сегментация базы клиентов для рекламы', 1.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (22, 'Создание визуала для Instagram', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (23, 'Публикация постов по контент-плану', 1.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (24, 'Отслеживание конверсий по лендингу', 3.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (25, 'Настройка ремаркетинга в Facebook', 2.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (26, 'Анализ охвата и вовлеченности в VK', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (27, 'Редизайн презентации клиента', 3.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (28, 'Формирование отчета по лидам', 1.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (29, 'Обновление рекламного баннера', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (30, 'Тестирование новых ключевых слов', 6.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (31, 'Создание шаблонов Stories', 1.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (32, 'Проверка и корректировка целевых аудиторий', 2.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (33, 'Координация съемки рекламного ролика', 4.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (34, 'Публикация сторис и взаимодействие с аудиторией', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (35, 'Создание баннера для email-письма', 2.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (36, 'Мониторинг позиций сайта', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (37, 'Разработка структуры лендинга', 3.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (38, 'Корректировка текстов под SEO', 8.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (39, 'Анализ результатов таргетинга', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (40, 'Настройка TikTok Ads', 2.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (41, 'Формирование технического задания для дизайнера', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (42, 'Ведение и сопровождение Telegram-канала', 3.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (43, 'Контроль выполнения KPI команды', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (44, 'Разработка стратегии удержания клиентов', 3.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (45, 'Проведение опроса ЦА', 1.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (46, 'Разработка посадочной страницы для продукта', 5.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (47, 'Оптимизация бюджета на рекламу', 2.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (48, 'Разработка визуальной айдентики', 3.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (49, 'Анализ отзывов пользователей и формирование отчета', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (50, 'Разработка стратегии репутационного маркетинга', 3.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (51, 'Создание отчета по email-кампании', 1.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (52, 'Настройка тестирования сплит-версий', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (53, 'Сбор семантического ядра', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (54, 'Публикация постов и сторис по расписанию', 5.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (55, 'Организация онлайн-мероприятия', 4.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (56, 'Контент-анализ конкурентов', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (57, 'Настройка Google Tag Manager', 1.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (58, 'Создание цепочки автоворонки в email', 3.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (59, 'Подготовка скриптов для холодных сообщений', 7.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (60, 'Оптимизация описания компании в соцсетях', 1.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (61, 'Проверка данных в CRM по лидам', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (62, 'Создание видеоинструкции для клиента', 3.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (63, 'Настройка ретаргетинга в Google Ads', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (64, 'Анализ конкурентов в нише', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (65, 'Подготовка презентации кейсов', 3.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (66, 'Работа с комьюнити в Telegram', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (67, 'Поддержка акций и распродаж в соцсетях', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (68, 'Обработка отзывов клиентов', 1.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (69, 'Создание обложек для Instagram Reels', 1.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (70, 'Анализ конверсий после вебинара', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (71, 'Разработка email-цепочек для новых лидов', 4.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (72, 'Координация команды фрилансеров', 3.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (73, 'Создание PDF-гайда для лид-магнита', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (74, 'Разметка лидов по интересам', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (75, 'Доработка лендинга по отзывам клиентов', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (76, 'Настройка событий в Яндекс.Метрике', 1.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (77, 'Формирование отчета о тестировании заголовков', 1.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (78, 'Тест AB-креативов в Facebook', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (79, 'Контроль сроков публикаций', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (80, 'Разработка дизайна для баннера Google Display', 2.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (81, 'Подбор референсов для креативов', 4.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (82, 'Создание контента по чек-листу', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (83, 'Анализ вовлеченности в Stories', 1.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (84, 'Создание постов с офферами', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (85, 'Обновление шаблонов рассылок', 1.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (86, 'Проверка посадочной страницы', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (87, 'Создание опроса для лидов', 1.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (88, 'Интерпретация метрик CTRCPA', 7.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (89, 'Разработка мини-сайта для продукта', 4.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (90, 'Проработка страниц о компании', 2);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (91, 'Тестирование посадочной страницы', 1.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (92, 'Планирование SMM-контента на квартал', 3.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (93, 'Создание контент-календаря', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (94, 'Обработка UGC-контента', 1.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (95, 'Форматирование презентации проекта', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (96, 'Обратная связь по рекламной воронке', 1.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (97, 'Поддержка и корректировка контекстной рекламы', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (98, 'Проработка заголовков и подзаголовков', 1.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (99, 'Настройка рекламы для нового оффера', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (100, 'Анализ переходов из Instagram', 3.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (101, 'Создание баннеров для YouTube Ads', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (102, 'Подготовка постов к запуску новой услуги', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (103, 'Оптимизация email-маркетинга', 1.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (104, 'Проверка сайта на адаптивность', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (105, 'Организация встреч с подрядчиками', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (106, 'Ведение календаря публикаций', 1.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (107, 'Контроль сроков выполнения задач подрядчиков', 1.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (108, 'Создание рекламных макетов', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (109, 'Настройка целей в CRM', 1.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (110, 'Сегментация базы для ретаргета', 1.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (111, 'Проверка соответствия creatives бренду', 1.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (112, 'Публикация обучающего контента', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (113, 'Контроль запуска кампании в Яндекс.Директ', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (114, 'Обновление визуала Instagram Stories', 1.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (115, 'Проверка текстов на соответствие тону бренда', 1.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (116, 'Работа с негативом в комментариях', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (117, 'Сбор вопросов для FAQ по продукту', 4.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (118, 'Формирование отчетов о взаимодействиях в чат-боте', 1.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (119, 'Анализ аудитории TikTok', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (120, 'Проверка ссылок на посадочных страницах', 1.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (121, 'Публикация постов в Facebook и VK', 1.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (122, 'Проверка полноты данных в email-форме', 1.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (123, 'Создание welcome-сообщения в боте', 1.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (124, 'Анализ падений охвата и вовлеченности', 1.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (125, 'Проверка мета-данных сайта', 1.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (126, 'Создание карточек товара для маркетплейса', 5.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (127, 'Настройка шаблона оффера', 1.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (128, 'Формирование писем благодарности', 1.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (129, 'Составление mindmap для воронки продаж', 7.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (130, 'Финальное тестирование email-цепочек', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (131, 'Создание видеоролика для Reels', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (132, 'Подготовка презентации для партнёров', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (133, 'Проведение звонков по холодной базе', 3.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (134, 'Подготовка индивидуальных коммерческих предложений', 2.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (135, 'Ведение воронки продаж в CRM', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (136, 'Анализ причин отказов клиентов', 2.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (137, 'Онлайн-встречи с потенциальными клиентами', 3.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (138, 'Рефакторинг кода backend-модуля', 3.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (139, 'Разработка REST API для нового функционала', 4.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (140, 'Интеграция платёжной системы', 3.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (141, 'Написание модульных тестов', 2.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (142, 'Устранение багов по тикетам из Jira', 2.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (143, 'Разработать план управления рисками для нового проекта', 11.30);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (144, 'Настроить базовый трекер задач в Jira для команды', 19.40);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (145, 'Провести анализ требований и составить WBS', 16.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (146, 'Составить коммуникационный план для внутренних стейкхолдеров', 27.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (147, 'Организовать ежедневный скрам для команды', 13.80);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (148, 'Внедрить систему отчетности по статусу спринта', 10.80);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (149, 'Провести ретроспективу предыдущего спринта', 21.70);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (150, 'Составить план улучшений рабочего процесса', 14.10);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (151, 'Развернуть Kanban-доску и обучить команду', 19.90);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (152, 'Настроить метрики производительности проекта и KPI', 6.60);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (153, 'Организовать управление изменениями в проекте', 22.20);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (154, 'Провести аудит текущего рабочего процесса и предложить улучшения', 27.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (155, 'Разработать стратегию внедрения PMO в компании', 20.20);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (156, 'Настроить централизованную систему мониторинга проектов', 13.70);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (157, 'Провести обучение по передовым практикам управления проектами', 12.20);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (158, 'Разработать методологию управления портфелем проектов', 22.10);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (159, 'Собрать и очистить набор данных для отчета', 19.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (160, 'Построить простую сводную таблицу с ключевыми метриками', 12.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (161, 'Выполнить визуализацию трендов с помощью matplotlib', 15.70);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (162, 'Написать SQL-запрос для выборки актуальных данных', 6.60);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (163, 'Разработать скрипт на Python для автоматической очистки данных', 17.30);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (164, 'Построить дашборд с основными показателями в Tableau или Power BI', 23.70);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (165, 'Провести анализ корреляций и представить результаты', 29.90);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (166, 'Настроить пайплайн сбора данных из внешнего API', 13.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (167, 'Внедрить модель прогнозирования на основе регрессии', 7.10);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (168, 'Оптимизировать структуру базы данных для ускорения запросов', 18.80);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (169, 'Автоматизировать отчеты с использованием Airflow', 7.80);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (170, 'Разработать дашборд с реальными данными в режиме реального времени', 6.70);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (171, 'Разработать и внедрить сложную нейронную сеть для прогнозов', 6.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (172, 'Построить кластерную модель сегментации клиентов', 23.80);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (173, 'Организовать обучение команды по advanced data science', 13.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (174, 'Разработать стратегию data-driven принятия решений в компании', 9.90);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (175, 'Настроить первую рекламную кампанию в Google Ads', 9.20);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (176, 'Создать рекламный баннер для соцсетей', 18.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (177, 'Провести анализ целевой аудитории и сегментировать ее', 26.60);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (178, 'Разработать контент-план для запуска в соцсетях', 7.80);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (179, 'Оптимизировать рекламный бюджет на основе метрик ROI', 20.10);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (180, 'Внедрить email-рассылки с персонализированными сообщениями', 6.20);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (181, 'Провести A/B тестирование рекламных объявлений', 21.20);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (182, 'Разработать стратегию ремаркетинга на 2 недели', 24.60);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (183, 'Настроить сквозную аналитику кампаний с помощью Google Analytics', 16.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (184, 'Организовать интеграцию CRM с маркетинговыми каналами', 19.30);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (185, 'Построить модель прогнозирования LTV клиентов', 20.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (186, 'Внедрить автоматизацию маркетинга через CRM-систему', 16.90);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (187, 'Разработать комплексную стратегию omnichannel-маркетинга', 16.20);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (188, 'Настроить advanced tracking и attribution для всех каналов', 25.30);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (189, 'Проанализировать эффективность multi-touch кампаний', 10.90);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (190, 'Разработать корпоративную стратегию digital-продвижения', 13.70);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (191, 'Создать адаптивную верстку простой страницы', 7.60);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (192, 'Настроить окружение и установить React', 19.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (193, 'Реализовать навигационное меню с помощью JavaScript', 10.30);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (194, 'Оптимизировать загрузку статических ресурсов', 18.10);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (195, 'Разработать SPA-приложение на React с роутингом', 10.10);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (196, 'Внедрить Redux (или аналог) для управления состоянием', 29.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (197, 'Написать модульные тесты для ключевых компонентов', 12.30);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (198, 'Оптимизировать сборку через Webpack или Vite', 25.90);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (199, 'Настроить CI/CD для фронтенд-проекта', 25.90);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (200, 'Реализовать lazy-loading для ключевых компонентов', 26.70);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (201, 'Обеспечить защиту от XSS и CSRF у клиентского приложения', 20.30);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (202, 'Провести аудит производительности и оптимизировать бандл', 27.70);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (203, 'Спроектировать архитектуру микрофронтендов для приложения', 16.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (204, 'Настроить SSR (Server-Side Rendering) для SEO', 18.30);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (205, 'Внедрить передовые стандарты accessibility (включая WCAG)', 24.70);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (206, 'Организовать внутренний семинар для джун-фронтенд-разработчиков', 13.40);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (207, 'Собрать окружение и запустить первый API на Node.js', 21.30);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (208, 'Разработать базовый CRUD для сущности ‘Пользователь’', 18.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (209, 'Настроить подключение к базе данных (PostgreSQL или MySQL)', 8.40);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (210, 'Реализовать простую систему аутентификации', 14.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (211, 'Оптимизировать запросы к базе данных с использованием индексов', 8.30);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (212, 'Внедрить REST API для управления основными ресурсами', 26.70);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (213, 'Настроить и провести интеграционное тестирование API', 21.40);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (214, 'Реализовать защиту эндпоинтов через JWT', 27.20);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (215, 'Настроить микросервисную архитектуру и разделить сервисы', 29.90);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (216, 'Автоматизировать деплоймент через Docker и Kubernetes', 10.80);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (217, 'Внедрить систему логирования и мониторинга сервисов', 26.80);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (218, 'Оптимизировать производительность backend-сервисов', 24.70);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (219, 'Спроектировать распределенную архитектуру с использованием gRPC', 11.30);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (220, 'Реализовать event-driven взаимодействие между сервисами', 14.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (221, 'Настроить масштабирование приложения под высокую нагрузку', 20.40);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (222, 'Внедрить best practices безопасности и аудита кода', 11.60);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (223, 'Создать прототип пользовательского интерфейса в Figma', 17.60);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (224, 'Провести юзабилити-тестирование простого мокапа', 10.70);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (225, 'Разработать moodboard для корпоративного стиля', 20.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (226, 'Изучить основы цветовой гармонии и типографики', 8.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (227, 'Спроектировать интерфейс мобильного приложения', 13.20);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (228, 'Внедрить дизайн-систему и компоненты в Figma', 18.40);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (229, 'Разработать интерактивный прототип для тестирования', 7.30);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (230, 'Провести анализ пользовательского опыта и исправить недочеты', 8.10);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (231, 'Организовать дизайн-review с участием смежных команд', 7.60);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (232, 'Настроить handoff дизайна для передачи разработчикам', 14.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (233, 'Внедрить систему управления версиями дизайн-макетов', 18.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (234, 'Оптимизировать пользовательский путь (UX) в текущем продукте', 6.70);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (235, 'Спроектировать комплексную дизайн-систему на уровне корпорации', 15.20);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (236, 'Настроить автоматизацию генерации спецификаций для dev-команды', 18.30);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (237, 'Организовать обучение младших дизайнеров и менторство', 21.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (238, 'Провести аудит всех интерфейсов и разработать план улучшений', 12.80);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (239, 'Собрать финансо-учетный отчет за квартал в Excel', 10.70);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (240, 'Разработать простую финансовую модель доходов и расходов', 7.10);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (241, 'Построить cash flow прогноз на основе исторических данных', 6.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (242, 'Изучить основы дисконтирования и NPV', 10.60);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (243, 'Автоматизировать сбор финансовых данных из ERP-системы', 11.20);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (244, 'Разработать сценарный анализ и стресс-тестирование модели', 7.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (245, 'Внедрить анализ чувствительности ключевых показателей', 20.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (246, 'Построить увязку бюджетов проекта с финансовым планом', 25.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (247, 'Оптимизировать структуру финансовой отчетности для инвесторов', 22.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (248, 'Разработать сложную модель оценки стоимости компании', 14.30);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (249, 'Внедрить систему план-факт анализа с графической отчетностью', 18.10);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (250, 'Провести аудит рисков и разработать финансовые контрмеры', 29.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (251, 'Спроектировать стратегию финансового планирования на 3 года', 29.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (252, 'Организовать работу финансового отдела и наставничество команды', 25.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (253, 'Внедрить advanced модели прогнозирования на основе машинного обучения', 22.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (254, 'Провести масштабную оптимизацию затрат и повысить маржинальность', 8.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (255, 'Исследовать актуальные нормативные требования по отрасли', 25.80);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (256, 'Создать базовый реестр рисков и определить их категории', 15.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (257, 'Провести анализ соответствия внутренним политикам компании', 6.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (258, 'Разработать шаблон отчета по комплаенсу', 7.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (259, 'Внедрить систему мониторинга изменений в законодательстве', 26.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (260, 'Провести аудит текущих бизнес-процессов на соответствие требованиям', 12.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (261, 'Разработать программу обучения сотрудников по compliance', 16.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (262, 'Автоматизировать сбор и обработку данных по рискам', 18.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (263, 'Организовать регулярный internal audit процессов компании', 9.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (264, 'Разработать план управления рисками и внедрить его', 25.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (265, 'Настроить систему показателей KPI для оценки комплаенса', 20.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (266, 'Внедрить процедуру расследования инцидентов и нарушений', 14.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (267, 'Спроектировать систему управления рисками на уровне холдинга', 22.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (268, 'Организовать корпоративную программу управления комплаенсом', 11.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (269, 'Провести тренинг для топ-менеджмента по антикоррупции', 14.40);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (270, 'Разработать стратегию реагирования на кризисные ситуации', 20.60);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (271, 'Провести анализ структуры текущей команды', 6.40);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (272, 'Разработать план командообразующих мероприятий', 16.70);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (273, 'Изучить основные методы мотивации сотрудников', 21.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (274, 'Провести первую оценку эффективности сотрудников', 21.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (275, 'Разработать индивидуальные планы развития для ключевых сотрудников', 19.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (276, 'Внедрить систему регулярных фидбек-сессий и оценок', 27.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (277, 'Организовать workshop по развитию soft skills', 29.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (278, 'Провести оценку компетенций команды и Gap-анализ', 12.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (279, 'Внедрить систему KPI для оценки командных результатов', 14.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (280, 'Разработать стратегию удержания ключевых талантов', 27.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (281, 'Настроить процессы адаптации новых сотрудников', 9.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (282, 'Организовать cross-functional team collaboration', 25.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (283, 'Спроектировать корпоративную программу лидерства', 21.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (284, 'Организовать mentoring program для middle-менеджеров', 6.70);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (285, 'Разработать стратегию развития корпоративной культуры', 10.80);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (286, 'Провести audit эффективности программ управления персоналом', 26.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (287, 'Провести мозговой штурм по генерации креативных идей', 6.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (288, 'Разработать moodboard для нового продукта', 14.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (289, 'Изучить современные техники креативного мышления', 14.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (290, 'Создать первые наброски визуальных концепций', 26.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (291, 'Организовать креативный воркшоп для команды', 20.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (292, 'Провести анализ трендов и собрать референсы', 8.60);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (293, 'Разработать серию уникальных визуальных сообщений', 17.60);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (294, 'Настроить систему сбора обратной связи по креативам', 15.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (295, 'Внедрить дизайн-концепцию на уровне бренда', 29.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (296, 'Разработать guidelines по креативному процессу', 20.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (297, 'Организовать презентацию креативных концепций для руководства', 29.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (298, 'Провести A/B тестирование разных креативных подходов', 27.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (299, 'Спроектировать глобальную креативную кампанию для компании', 9.00);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (300, 'Внедрить инновационные техники генерации идей', 6.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (301, 'Организовать обучение и менторство по креативному мышлению', 12.50);
+INSERT INTO `Talent_management`.`Task` (`idTask`, `Taskcol`, `Task_hour`) VALUES (302, 'Разработать стратегию креативного развития бренда на 3 года', 20.00);
+
+COMMIT;
+
+
+-- -----------------------------------------------------
+-- Data for table `Talent_management`.`Talant_Task`
+-- -----------------------------------------------------
+START TRANSACTION;
+USE `Talent_management`;
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (1, 1, 143);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (1, 1, 144);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (1, 1, 145);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (1, 1, 146);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (1, 2, 147);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (1, 2, 148);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (1, 2, 149);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (1, 2, 150);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (1, 3, 151);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (1, 3, 152);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (1, 3, 153);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (1, 3, 154);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (1, 4, 155);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (1, 4, 156);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (1, 4, 157);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (1, 4, 158);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (2, 1, 159);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (2, 1, 160);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (2, 1, 161);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (2, 1, 162);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (2, 2, 163);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (2, 2, 164);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (2, 2, 165);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (2, 2, 166);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (2, 3, 167);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (2, 3, 168);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (2, 3, 169);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (2, 3, 170);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (2, 4, 171);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (2, 4, 172);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (2, 4, 173);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (2, 4, 174);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (3, 1, 175);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (3, 1, 176);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (3, 1, 177);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (3, 1, 178);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (3, 2, 179);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (3, 2, 180);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (3, 2, 181);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (3, 2, 182);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (3, 3, 183);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (3, 3, 184);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (3, 3, 185);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (3, 3, 186);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (3, 4, 187);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (3, 4, 188);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (3, 4, 189);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (3, 4, 190);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (4, 1, 191);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (4, 1, 192);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (4, 1, 193);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (4, 1, 194);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (4, 2, 195);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (4, 2, 196);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (4, 2, 197);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (4, 2, 198);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (4, 3, 199);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (4, 3, 200);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (4, 3, 201);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (4, 3, 202);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (4, 4, 203);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (4, 4, 204);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (4, 4, 205);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (4, 4, 206);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (5, 1, 207);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (5, 1, 208);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (5, 1, 209);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (5, 1, 210);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (5, 2, 211);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (5, 2, 212);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (5, 2, 213);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (5, 2, 214);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (5, 3, 215);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (5, 3, 216);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (5, 3, 217);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (5, 3, 218);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (5, 4, 219);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (5, 4, 220);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (5, 4, 221);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (5, 4, 222);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (6, 1, 223);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (6, 1, 224);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (6, 1, 225);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (6, 1, 226);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (6, 2, 227);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (6, 2, 228);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (6, 2, 229);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (6, 2, 230);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (6, 3, 231);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (6, 3, 232);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (6, 3, 233);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (6, 3, 234);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (6, 4, 235);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (6, 4, 236);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (6, 4, 237);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (6, 4, 238);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (7, 1, 239);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (7, 1, 240);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (7, 1, 241);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (7, 1, 242);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (7, 2, 243);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (7, 2, 244);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (7, 2, 245);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (7, 2, 246);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (7, 3, 247);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (7, 3, 248);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (7, 3, 249);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (7, 3, 250);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (7, 4, 251);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (7, 4, 252);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (7, 4, 253);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (7, 4, 254);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (8, 1, 255);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (8, 1, 256);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (8, 1, 257);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (8, 1, 258);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (8, 2, 259);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (8, 2, 260);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (8, 2, 261);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (8, 2, 262);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (8, 3, 263);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (8, 3, 264);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (8, 3, 265);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (8, 3, 266);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (8, 4, 267);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (8, 4, 268);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (8, 4, 269);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (8, 4, 270);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (9, 1, 271);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (9, 1, 272);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (9, 1, 273);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (9, 1, 274);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (9, 2, 275);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (9, 2, 276);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (9, 2, 277);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (9, 2, 278);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (9, 3, 279);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (9, 3, 280);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (9, 3, 281);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (9, 3, 282);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (9, 4, 283);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (9, 4, 284);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (9, 4, 285);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (9, 4, 286);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (10, 1, 287);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (10, 1, 288);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (10, 1, 289);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (10, 1, 290);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (10, 2, 291);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (10, 2, 292);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (10, 2, 293);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (10, 2, 294);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (10, 3, 295);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (10, 3, 296);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (10, 3, 297);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (10, 3, 298);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (10, 4, 299);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (10, 4, 300);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (10, 4, 301);
+INSERT INTO `Talent_management`.`Talant_Task` (`idTalant`, `idLevel`, `idTask`) VALUES (10, 4, 302);
+
+COMMIT;
+
+
+-- -----------------------------------------------------
+-- Data for table `Talent_management`.`Level_cost`
+-- -----------------------------------------------------
+START TRANSACTION;
+USE `Talent_management`;
+INSERT INTO `Talent_management`.`Level_cost` (`idLevel`, `idTalant`, `Level_cost`) VALUES (1, 1, 35000);
+INSERT INTO `Talent_management`.`Level_cost` (`idLevel`, `idTalant`, `Level_cost`) VALUES (2, 1, 50000);
+INSERT INTO `Talent_management`.`Level_cost` (`idLevel`, `idTalant`, `Level_cost`) VALUES (3, 1, 65000);
+INSERT INTO `Talent_management`.`Level_cost` (`idLevel`, `idTalant`, `Level_cost`) VALUES (4, 1, 80000);
+INSERT INTO `Talent_management`.`Level_cost` (`idLevel`, `idTalant`, `Level_cost`) VALUES (1, 2, 40000);
+INSERT INTO `Talent_management`.`Level_cost` (`idLevel`, `idTalant`, `Level_cost`) VALUES (2, 2, 60000);
+INSERT INTO `Talent_management`.`Level_cost` (`idLevel`, `idTalant`, `Level_cost`) VALUES (3, 2, 80000);
+INSERT INTO `Talent_management`.`Level_cost` (`idLevel`, `idTalant`, `Level_cost`) VALUES (4, 2, 100000);
+INSERT INTO `Talent_management`.`Level_cost` (`idLevel`, `idTalant`, `Level_cost`) VALUES (1, 3, 30000);
+INSERT INTO `Talent_management`.`Level_cost` (`idLevel`, `idTalant`, `Level_cost`) VALUES (2, 3, 45000);
+INSERT INTO `Talent_management`.`Level_cost` (`idLevel`, `idTalant`, `Level_cost`) VALUES (3, 3, 60000);
+INSERT INTO `Talent_management`.`Level_cost` (`idLevel`, `idTalant`, `Level_cost`) VALUES (4, 3, 75000);
+INSERT INTO `Talent_management`.`Level_cost` (`idLevel`, `idTalant`, `Level_cost`) VALUES (1, 4, 38000);
+INSERT INTO `Talent_management`.`Level_cost` (`idLevel`, `idTalant`, `Level_cost`) VALUES (2, 4, 55000);
+INSERT INTO `Talent_management`.`Level_cost` (`idLevel`, `idTalant`, `Level_cost`) VALUES (3, 4, 72000);
+INSERT INTO `Talent_management`.`Level_cost` (`idLevel`, `idTalant`, `Level_cost`) VALUES (4, 4, 90000);
+INSERT INTO `Talent_management`.`Level_cost` (`idLevel`, `idTalant`, `Level_cost`) VALUES (1, 5, 40000);
+INSERT INTO `Talent_management`.`Level_cost` (`idLevel`, `idTalant`, `Level_cost`) VALUES (2, 5, 60000);
+INSERT INTO `Talent_management`.`Level_cost` (`idLevel`, `idTalant`, `Level_cost`) VALUES (3, 5, 80000);
+INSERT INTO `Talent_management`.`Level_cost` (`idLevel`, `idTalant`, `Level_cost`) VALUES (4, 5, 100000);
+INSERT INTO `Talent_management`.`Level_cost` (`idLevel`, `idTalant`, `Level_cost`) VALUES (1, 6, 32000);
+INSERT INTO `Talent_management`.`Level_cost` (`idLevel`, `idTalant`, `Level_cost`) VALUES (2, 6, 48000);
+INSERT INTO `Talent_management`.`Level_cost` (`idLevel`, `idTalant`, `Level_cost`) VALUES (3, 6, 64000);
+INSERT INTO `Talent_management`.`Level_cost` (`idLevel`, `idTalant`, `Level_cost`) VALUES (4, 6, 80000);
+INSERT INTO `Talent_management`.`Level_cost` (`idLevel`, `idTalant`, `Level_cost`) VALUES (1, 7, 36000);
+INSERT INTO `Talent_management`.`Level_cost` (`idLevel`, `idTalant`, `Level_cost`) VALUES (2, 7, 54000);
+INSERT INTO `Talent_management`.`Level_cost` (`idLevel`, `idTalant`, `Level_cost`) VALUES (3, 7, 72000);
+INSERT INTO `Talent_management`.`Level_cost` (`idLevel`, `idTalant`, `Level_cost`) VALUES (4, 7, 90000);
+INSERT INTO `Talent_management`.`Level_cost` (`idLevel`, `idTalant`, `Level_cost`) VALUES (1, 8, 34000);
+INSERT INTO `Talent_management`.`Level_cost` (`idLevel`, `idTalant`, `Level_cost`) VALUES (2, 8, 51000);
+INSERT INTO `Talent_management`.`Level_cost` (`idLevel`, `idTalant`, `Level_cost`) VALUES (3, 8, 68000);
+INSERT INTO `Talent_management`.`Level_cost` (`idLevel`, `idTalant`, `Level_cost`) VALUES (4, 8, 85000);
+INSERT INTO `Talent_management`.`Level_cost` (`idLevel`, `idTalant`, `Level_cost`) VALUES (1, 9, 33000);
+INSERT INTO `Talent_management`.`Level_cost` (`idLevel`, `idTalant`, `Level_cost`) VALUES (2, 9, 49000);
+INSERT INTO `Talent_management`.`Level_cost` (`idLevel`, `idTalant`, `Level_cost`) VALUES (3, 9, 65000);
+INSERT INTO `Talent_management`.`Level_cost` (`idLevel`, `idTalant`, `Level_cost`) VALUES (4, 9, 81000);
+INSERT INTO `Talent_management`.`Level_cost` (`idLevel`, `idTalant`, `Level_cost`) VALUES (1, 10, 28000);
+INSERT INTO `Talent_management`.`Level_cost` (`idLevel`, `idTalant`, `Level_cost`) VALUES (2, 10, 42000);
+INSERT INTO `Talent_management`.`Level_cost` (`idLevel`, `idTalant`, `Level_cost`) VALUES (3, 10, 56000);
+INSERT INTO `Talent_management`.`Level_cost` (`idLevel`, `idTalant`, `Level_cost`) VALUES (4, 10, 70000);
+
+COMMIT;
+
+
+-- -----------------------------------------------------
+-- Data for table `Talent_management`.`Vacancy`
+-- -----------------------------------------------------
+START TRANSACTION;
+USE `Talent_management`;
+INSERT INTO `Talent_management`.`Vacancy` (`idVacancy`, `Vacancycol`) VALUES (1, 'Дизайнер');
+
+COMMIT;
+
+
+-- -----------------------------------------------------
+-- Data for table `Talent_management`.`Request`
+-- -----------------------------------------------------
+START TRANSACTION;
+USE `Talent_management`;
+INSERT INTO `Talent_management`.`Request` (`idLevel`, `idTalant`, `idVacancy`, `Priority`) VALUES (4, 10, 1, 60);
+INSERT INTO `Talent_management`.`Request` (`idLevel`, `idTalant`, `idVacancy`, `Priority`) VALUES (3, 6, 1, 40);
+
+COMMIT;
+
+
+-- -----------------------------------------------------
+-- Data for table `Talent_management`.`Shedule`
+-- -----------------------------------------------------
+START TRANSACTION;
+USE `Talent_management`;
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (1, 1);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (2, 1);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (3, 1);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (4, 1);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (5, 1);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (6, 2);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (7, 2);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (8, 2);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (9, 2);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (10, 2);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (11, 3);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (12, 3);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (13, 3);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (14, 3);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (15, 3);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (16, 4);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (17, 4);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (18, 4);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (19, 4);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (20, 4);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (21, 5);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (22, 5);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (23, 5);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (24, 5);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (25, 5);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (26, 6);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (27, 6);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (28, 6);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (29, 6);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (30, 6);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (31, 6);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (32, 7);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (33, 7);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (34, 7);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (35, 7);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (36, 8);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (37, 8);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (38, 8);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (39, 8);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (40, 8);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (41, 9);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (42, 9);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (43, 9);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (44, 9);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (45, 10);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (46, 10);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (47, 10);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (48, 10);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (49, 11);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (50, 11);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (51, 11);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (52, 11);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (53, 11);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (54, 12);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (55, 12);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (56, 12);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (57, 12);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (58, 13);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (59, 13);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (60, 13);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (61, 13);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (62, 14);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (63, 14);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (64, 14);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (65, 14);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (66, 15);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (67, 15);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (68, 15);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (69, 15);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (70, 15);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (71, 16);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (72, 16);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (73, 16);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (74, 16);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (75, 17);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (76, 17);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (77, 17);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (78, 17);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (79, 17);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (80, 18);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (81, 18);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (82, 18);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (83, 18);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (84, 18);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (85, 19);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (86, 19);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (87, 19);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (88, 19);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (89, 20);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (90, 20);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (91, 20);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (92, 20);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (93, 21);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (94, 21);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (95, 21);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (96, 21);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (97, 22);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (98, 22);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (99, 22);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (100, 22);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (101, 23);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (102, 23);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (103, 23);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (104, 23);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (105, 24);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (106, 24);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (107, 24);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (108, 24);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (109, 25);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (110, 25);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (111, 25);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (112, 25);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (113, 26);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (114, 26);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (115, 26);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (116, 26);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (117, 27);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (118, 27);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (119, 27);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (120, 27);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (121, 28);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (122, 28);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (123, 28);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (124, 28);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (125, 29);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (126, 29);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (127, 29);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (128, 29);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (129, 30);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (130, 30);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (131, 30);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (132, 30);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (133, 31);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (134, 31);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (135, 31);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (136, 31);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (137, 31);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (138, 32);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (139, 32);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (140, 32);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (141, 32);
+INSERT INTO `Talent_management`.`Shedule` (`idTask`, `idStaff`) VALUES (142, 32);
+
+COMMIT;
+
