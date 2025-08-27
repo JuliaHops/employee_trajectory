@@ -32,7 +32,7 @@
 - функция затрат,  
 - ограничения по времени и ресурсам.  
 
-<img width="431" height="685" alt="image" src="https://github.com/user-attachments/assets/c3e33079-74e9-440f-af2f-a18c34674362" />
+<img width="400" height="685" alt="image" src="https://github.com/user-attachments/assets/c3e33079-74e9-440f-af2f-a18c34674362" />
 
 Рисунок 1.1 — Функция компетенции 
 
