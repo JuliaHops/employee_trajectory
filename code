@@ -1,0 +1,276 @@
+    train_time = 0.0
+            train_cost = 0.0
+
+            for talant_id, req_lvl, weight in comps:
+                # ищем текущий уровень сотрудника по idTalant
+                emp_skill = skills[
+                    (skills["ID сотрудника"] == emp_id) &
+                    (skills["idTalant"] == talant_id)
+                ]
+                emp_lvl = int(emp_skill["Уровень (1–5)"].values[0]) \
+                          if not emp_skill.empty else 0
+
+                # штраф за недокомплект (чем больше разница, тем хуже)
+                diff = max(0, req_lvl - emp_lvl)
+                score += diff * weight
+
+                if emp_lvl < req_lvl:
+                    # начинаем с emp_lvl (если emp_lvl=0, значит с уровня 1)
+                    start_lvl = emp_lvl if emp_lvl > 0 else 1
+                    for lvl in range(start_lvl, req_lvl):
+                        # достаём из словарей по (idTalant, lvl)
+                        train_cost += level_costs.get((talant_id, lvl), 0.0)
+                        train_time += level_task_hours.get((talant_id, lvl), 0.0)
+
+            scores.append((emp_id, score, load, train_time, train_cost))
+
+        # сортируем: сначала по соответствию (score), затем по загруженности (load)
+        scores_sorted = sorted(scores, key=lambda x: (x[1], x[2]))
+        top_employees = scores_sorted[: self.n_spin.value()]
+
+        self.result_list.clear()
+        for emp_id, sc, load, t_time, t_cost in top_employees:
+            name = employees.loc[employees["ID"] == emp_id, "ФИО"].values[0]
+            category = self.classify_candidate(score=sc, load_percent=load)
+            item_text = (
+                f"{name} — {category}, Отклонение: {sc:.3f}, "
+                f"Загруженность: {load:.1f}%, "
+                f"Время обучения: {t_time:.1f} ч, "
+                f"Стоимость: {t_cost:.2f}"
+            )
+            item = QListWidgetItem(item_text)
+            item.setData(256, emp_id)
+            self.result_list.addItem(item)
+
+
+
+
+    def show_employee_details(self, item):
+        emp_id = item.data(256)
+        emp_data = employees[employees["ID"] == emp_id].iloc[0]
+        emp_skills = skills[skills["ID сотрудника"] == emp_id]
+
+        dialog = QDialog(self)
+        dialog.setWindowTitle(f"Детали сотрудника: {emp_data['ФИО']}")
+
+        content_layout = QVBoxLayout()
+        content_layout.addWidget(QLabel(f"<b>ФИО:</b> {emp_data['ФИО']}"))
+        content_layout.addWidget(QLabel(f"<b>Подразделение:</b> {emp_data['Подразделение']}"))
+        content_layout.addWidget(QLabel("<b>Компетенции и задачи для повышения:</b>"))
+
+        for comp_box, level_box, _ in self.comp_boxes:
+            req_comp = comp_box.currentText()
+            req_level = level_box.value()
+            emp_skill_row = emp_skills[emp_skills["Компетенция"] == req_comp]
+            emp_level = int(emp_skill_row["Уровень (1–5)"].values[0]) if not emp_skill_row.empty else 0
+            if emp_level >= req_level:
+                continue
+
+            content_layout.addWidget(QLabel(
+                f"<b>{req_comp} (текущий: {emp_level}, целевой: {req_level}):</b>"
+            ))
+            for lvl in range(emp_level, req_level):
+                key = (req_comp, lvl)
+                tasks_list = level_tasks.get(key, [])
+                if tasks_list:
+                    content_layout.addWidget(QLabel(f"  Задачи до уровня {lvl}:"))
+                    for task in tasks_list:
+                        content_layout.addWidget(QLabel(f"    • {task}"))
+
+        scroll_area = QScrollArea()
+        scroll_area.setWidgetResizable(True)
+        container = QWidget()
+        container.setLayout(content_layout)
+        scroll_area.setWidget(container)
+
+        main_layout = QVBoxLayout()
+        main_layout.addWidget(scroll_area)
+        dialog.setLayout(main_layout)
+
+        dialog.resize(500, 400)
+        dialog.exec()
+
+    def save_request(self):
+        from sqlalchemy import text
+
+        vacancy_name = self.input_position.text().strip()
+        if not vacancy_name:
+            return
+
+        with engine.begin() as conn:
+            # Сохраняем вакансию
+            insert_vacancy = text("""
+                INSERT INTO Vacancy (Vacancycol)
+                VALUES (:name)
+            """)
+            result = conn.execute(insert_vacancy, {"name": vacancy_name})
+            vacancy_id = result.lastrowid
+
+            # Сохраняем компетенции
+            insert_request = text("""
+                INSERT INTO Request (idTalant, idLevel, idVacancy, Priority)
+                VALUES (:id_talant, :id_level, :id_vacancy, :priority)
+            """)
+
+            for comp_box, level_box, weight_box in self.comp_boxes:
+                talant_name = comp_box.currentText()
+                priority = weight_box.value()
+                level = level_box.value()
+                if priority <= 0:
+                    continue
+
+                # Получаем idTalant
+                talant_id_result = conn.execute(text("""
+                    SELECT idTalant FROM Talant WHERE Talantcol = :name
+                """), {"name": talant_name}).fetchone()
+
+                if talant_id_result:
+                    id_talant = talant_id_result.idTalant
+                    conn.execute(insert_request, {
+                        "id_talant": id_talant,
+                        "id_level": level,
+                        "id_vacancy": vacancy_id,
+                        "priority": priority
+                    })
+
+        # Обновляем страницу заявок после сохранения
+        self.parent().parent().update_requests_page()
+        self.parent().parent().stack.setCurrentIndex(2)
+
+
+
+class MainApp(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Менеджер компетенций")
+        self.resize(1000, 600)
+
+        central_widget = QWidget()
+        main_layout = QHBoxLayout(central_widget)
+        self.setCentralWidget(central_widget)
+
+        button_style = """
+        QPushButton {
+            border: none;
+            background-color: transparent;
+            padding: 4px 6px;
+            text-align: left;
+            font-size: 13px;
+        }
+        QPushButton:hover {
+            background-color: #d0e3ff;
+            border-radius: 6px;
+        }
+        """
+
+        # Левое меню
+        menu_layout = QVBoxLayout()
+        menu_layout.setSpacing(15)
+        menu_layout.setContentsMargins(10, 10, 10, 10)
+
+        btn_search = QPushButton("🔍 Поиск")
+        btn_search.setStyleSheet(button_style)
+        btn_search.clicked.connect(lambda: self.stack.setCurrentIndex(0))
+        menu_layout.addWidget(btn_search)
+
+        btn_employees = QPushButton("👥 Сотрудники")
+        btn_employees.setStyleSheet(button_style)
+        btn_employees.clicked.connect(lambda: self.stack.setCurrentIndex(1))
+        menu_layout.addWidget(btn_employees)
+
+        btn_requests = QPushButton("📄 Заявки на должность")
+        btn_requests.setStyleSheet(button_style)
+        btn_requests.clicked.connect(self.show_requests_page)
+        menu_layout.addWidget(btn_requests)
+
+        menu_layout.addStretch()
+        main_layout.addLayout(menu_layout, 1)
+
+        # Центральный QStackedWidget
+        self.stack = QStackedWidget()
+        main_layout.addWidget(self.stack, 4)
+
+        # Страница поиска
+        self.search_page = SearchApp()
+        self.stack.addWidget(self.search_page)
+
+        # Страница сотрудников (уменьшенный шрифт)
+        emp_container = QWidget()
+        emp_container.setStyleSheet("font-size: 12px;")
+        emp_layout = QVBoxLayout(emp_container)
+        emp_layout.setContentsMargins(10, 10, 10, 10)
+        emp_layout.setSpacing(6)
+        for dept in sorted(employees["Подразделение"].unique()):
+            emp_layout.addWidget(QLabel(f"<b>{dept}</b>"))
+            dept_emps = employees[employees["Подразделение"] == dept]
+            for _, row in dept_emps.iterrows():
+                emp_layout.addWidget(QLabel(f"• {row['ФИО']} (ID: {row['ID']})"))
+
+        emp_scroll = QScrollArea()
+        emp_scroll.setWidgetResizable(True)
+        emp_scroll.setWidget(emp_container)
+        self.employees_page = emp_scroll
+        self.stack.addWidget(self.employees_page)
+
+        # Страница заявок
+        self.update_requests_page()
+
+    def update_requests_page(self):
+        from sqlalchemy import text
+
+        req_container = QWidget()
+        req_container.setStyleSheet("font-size: 12px;")
+        req_layout = QVBoxLayout(req_container)
+        req_layout.setContentsMargins(10, 10, 10, 10)
+        req_layout.setSpacing(8)
+
+        with engine.begin() as conn:
+            # Получаем все вакансии
+            vacancies = conn.execute(text("""
+                SELECT idVacancy, Vacancycol FROM Vacancy ORDER BY idVacancy DESC
+            """)).fetchall()
+
+            for vac in vacancies:
+                reqs = conn.execute(text("""
+                    SELECT t.Talantcol, l.Levelcol, r.Priority
+                    FROM Request r
+                    JOIN Talant t ON r.idTalant = t.idTalant
+                    JOIN Level l ON r.idLevel = l.idLevel
+                    WHERE r.idVacancy = :id
+                    ORDER BY r.Priority DESC
+                """), {"id": vac.idVacancy}).fetchall()
+
+                if reqs:
+                    comp_texts = [f"{r.Talantcol} (уровень {r.Levelcol}, приоритет {r.Priority:.1f})" for r in reqs]
+                    comp_summary = "; ".join(comp_texts)
+                    label = QLabel(f"📌 <b>{vac.Vacancycol}</b><br>🔧 {comp_summary}")
+                    label.setWordWrap(True)
+                    req_layout.addWidget(label)
+
+        if req_layout.count() == 0:
+            req_layout.addWidget(QLabel("📩 Пока нет сохраненных заявок."))
+
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setWidget(req_container)
+        self.requests_page = scroll
+
+        if self.stack.count() < 3:
+            self.stack.addWidget(self.requests_page)
+        else:
+            self.stack.removeWidget(self.stack.widget(2))
+            self.stack.addWidget(self.requests_page)
+
+
+    def show_requests_page(self):
+        self.update_requests_page()
+        self.stack.setCurrentIndex(2)
+
+
+
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    win = MainApp()
+    win.show()
+    sys.exit(app.exec())
