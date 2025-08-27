@@ -32,15 +32,15 @@
 - функция затрат,  
 - ограничения по времени и ресурсам.  
 
-<img width="350" height="685" alt="image" src="https://github.com/user-attachments/assets/c3e33079-74e9-440f-af2f-a18c34674362" />
+<img width="250" height="685" alt="image" src="https://github.com/user-attachments/assets/c3e33079-74e9-440f-af2f-a18c34674362" />
 
 Рисунок 1.1 — Функция компетенции 
 
-<img width="400" height="1081" alt="image" src="https://github.com/user-attachments/assets/55697be0-700f-4bb3-aff3-aa2a649f44d1" />
+<img width="350" height="1081" alt="image" src="https://github.com/user-attachments/assets/55697be0-700f-4bb3-aff3-aa2a649f44d1" />
 
 Рисунок 1.2 — Функция анализа сотрудника 
 
-<img width="350" height="1188" alt="image" src="https://github.com/user-attachments/assets/974699bb-2d6e-4b31-bdf1-4c3e45c0b591" />
+<img width="250" height="1188" alt="image" src="https://github.com/user-attachments/assets/974699bb-2d6e-4b31-bdf1-4c3e45c0b591" />
 
 Рисунок 1.3 — Общая схема процесса
 
@@ -52,7 +52,7 @@
 Основные данные: загрузка сотрудников, текущая квалификация, требования к вакансиям, кадровый учет.  
 
 
-<img width="792" height="820" alt="image" src="https://github.com/user-attachments/assets/fdc80d81-60fa-46c3-a40e-30a7c59e8e9b" />
+<img width="500" height="820" alt="image" src="https://github.com/user-attachments/assets/fdc80d81-60fa-46c3-a40e-30a7c59e8e9b" />
 
 Рисунок 2.1 — Модель компетенций (множество требований)  
 
